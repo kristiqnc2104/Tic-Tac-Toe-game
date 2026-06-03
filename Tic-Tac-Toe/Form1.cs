@@ -16,7 +16,7 @@ namespace Tic_Tac_Toe
         {
             InitializeComponent();
         }
-        class Game
+        public class Game
         {
             public char[,] board;
             public char currentPlayer;
@@ -99,17 +99,149 @@ namespace Tic_Tac_Toe
 
             public void ResetGame()
             {
-
+                for (int r = 0; r < 3; r++)
+                    for (int c = 0; c < 3; c++)
+                    {
+                        board[r, c] = ' ';
+                    }
+                        
+                currentPlayer = 'X';
+                IsGameOver = false;
             }
 
             public char GetCell(int row, int col)
             {
-                return 'a';
+                return board[row, col];
             }
 
 
         }
 
+        public class AI
+        {
+            private char aiChar;
+            private char humanChar;
+
+            public AI(char aiSymbol = 'O', char humanSymbol = 'X')
+            {
+                aiChar = aiSymbol;
+                humanChar = humanSymbol;
+            }
+
+            public int[] GetBestMove(char[,] board)
+            {
+                int bestScore = int.MinValue;
+                int[] bestMove = new int[] {-1,-1};
+
+                for (int r = 0; r < 3; r++)
+                {
+                    for (int c = 0; c < 3; c++)
+                    {
+                        if (board[r, c] == ' ')
+                        {
+                            board[r, c] = aiChar;
+                            int score = Minimax(board, 0, false);
+                            board[r, c] = ' ';
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                                bestMove = new int[] { r, c };
+                            }
+                        }
+                    }
+                }
+                return bestMove;
+            }
+
+            private int Minimax(char[,] board, int depth, bool isMaximizing)
+            {
+                if (CheckWin(board, aiChar)) return 10 - depth;
+                if (CheckWin(board, humanChar)) return depth - 10;
+                if (IsFull(board)) return 0;
+
+                if (isMaximizing)
+                {
+                    int best = int.MinValue;
+                    for (int r = 0; r < 3; r++)
+                        for (int c = 0; c < 3; c++)
+                            if (board[r, c] == ' ')
+                            {
+                                board[r, c] = aiChar;
+                                best = Math.Max(best, Minimax(board, depth + 1, false));
+                                board[r, c] = ' ';
+                            }
+                    return best;
+                }
+                else
+                {
+                    int best = int.MaxValue;
+                    for (int r = 0; r < 3; r++)
+                        for (int c = 0; c < 3; c++)
+                            if (board[r, c] == ' ')
+                            {
+                                board[r, c] = humanChar;
+                                best = Math.Min(best, Minimax(board, depth + 1, true));
+                                board[r, c] = ' ';
+                            }
+                    return best;
+                }
+            }
+
+            public bool CanWin(char[,] board, char player)
+            {
+                for (int r = 0; r < 3; r++)
+                    for (int c = 0; c < 3; c++)
+                        if (board[r, c] == ' ')
+                        {
+                            board[r, c] = player;
+                            bool wins = CheckWin(board, player);
+                            board[r, c] = ' ';
+                            if (wins) return true;
+                        }
+                return false;
+            }
+
+            private bool CheckWin(char[,] b, char p)
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    if (b[i, 0] == p && b[i, 1] == p && b[i, 2] == p) return true;
+                    if (b[0, i] == p && b[1, i] == p && b[2, i] == p) return true;
+                }
+                if (b[0, 0] == p && b[1, 1] == p && b[2, 2] == p) return true;
+                if (b[0, 2] == p && b[1, 1] == p && b[2, 0] == p) return true;
+                return false;
+            }
+
+            private bool IsFull(char[,] b)
+            {
+                foreach (char c in b) if (c == ' ') return false;
+                return true;
+            }
+
+            public int EvaluateMove(char[,] board, int row, int col, char player)
+            {
+                board[row, col] = player;
+                int score = 0;
+                if (CheckWin(board, player)) score = 10;
+                board[row, col] = ' ';
+                return score;
+            }
+        }
+        public class Player
+        {
+            public string Name { get; set; }
+            public char Symbol { get; set; }
+            public bool IsHuman { get; set; }
+
+            public Player(string name, char symbol, bool isHuman)
+            {
+                Name = name;
+                Symbol = symbol;
+                IsHuman = isHuman;
+            }
+        }
+        
         private void button2_Click(object sender, EventArgs e)
         {
 
