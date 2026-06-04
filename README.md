@@ -1,2 +1,2 @@
 # Tic-Tac-Toe game
-WFA (.NET Framework) game
+WFA (.NET Framework)
