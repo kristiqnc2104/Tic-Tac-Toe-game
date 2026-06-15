@@ -304,7 +304,7 @@ namespace Tic_Tac_Toe
             if (game.IsGameOver || game.CurrentPlayer != 'X') return;
 
             Button clickedButton = (sender as Button);
-            int[] coords = (int[])clickedButton.Tag;
+            int[] coords = clickedButton.Tag as int[];
             int row = coords[0];
             int col = coords[1];
 
